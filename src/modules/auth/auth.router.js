@@ -1,0 +1,12 @@
+import { Router } from "express";
+import * as authController from "./controller/auth.js";
+import auth from "../../middlewear/auth.js";
+import validation from "../../middlewear/validate.js";
+import * as validate from "./auth.validate.js";
+const router = Router();
+router.post("/signup", validation(validate.signup), authController.signup);
+router.get("/confirmemail/:token",validation(validate.token), authController.confirmEmail);
+router.get("/Refreshtoken/:tokenRefresh",validation(validate.token), authController.refreshToken);
+router.post("/login",validation(validate.signin), authController.signin);
+router.patch("/logout" ,validation(validate.logOut), auth(), authController.logout);
+export default router;
