@@ -1,21 +1,24 @@
 import { Router } from "express";
 import * as messageController from "./controller/message.js";
-import * as validate from "./message.validate.js";
-import auth from "../../middlewear/auth.js";
-import validation from "../../middlewear/validate.js";
+import auth from "../../middlewhere/auth.js";
+import validation from "../../middlewhere/validation.js";
+import * as validators from "./message.validation.js";
 const router = Router({ mergeParams: true });
-router.post("/", validation(validate.addMessage), messageController.addMessage);
+router.post(
+  "/",
+  validation(validators.addMessage),
+  messageController.addMessage
+);
 router.delete(
   "/:id",
-  validation(validate.idAndToken),
+  validation(validators.deleteMessage),
   auth(),
   messageController.deleteMessage
 );
-router.get("/", validation(validate.token), auth(), messageController.messages);
 router.get(
-  "/:id",
-  validation(validate.idAndToken),
+  "/",
+  validation(validators.messages),
   auth(),
-  messageController.getMessageById
+  messageController.messages
 );
 export default router;

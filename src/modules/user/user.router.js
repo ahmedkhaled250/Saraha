@@ -1,70 +1,58 @@
 import { Router } from "express";
+import auth from "../../middlewhere/auth.js";
+import { fileValidation, uploadPhoto } from "../../services/uploadPhoto.js";
 import * as userController from "./controller/user.js";
-import * as validate from "./user.validate.js";
-import auth from "../../middlewear/auth.js";
-import validation from "../../middlewear/validate.js";
-import { HME, multerValidation, myMulter } from "../../services/multer.js";
+import messageRouter from "../message/message.router.js";
+import validation from "../../middlewhere/validation.js";
+import * as validators from "./user.validation.js";
 const router = Router();
-
+router.use("/:id/message", messageRouter);
 router.patch(
-  "/profilePic",
-  validation(validate.token),
+  "/profilPic",
+  validation(validators.headers),
   auth(),
-  myMulter(multerValidation.image).single("image"),
-  HME,
+  uploadPhoto({ customValidation: fileValidation.image }).single("image"),
   userController.profilePic
 );
-
-router.get(
-  "/sharelinkprofile/:id",
-  validation(validate.sharelinkprofile),
-  userController.sharelinkprofile
-);
-router.get(
-  "/shareprofile",
-  validation(validate.token),
+router.patch(
+  "/deleteProfilePic",
+  validation(validators.headers),
   auth(),
-  userController.shareprofile
-);
-router.put(
-  "/updateProfile",
-  validation(validate.updateProfile),
-  auth(),
-  userController.updateProfile
+  userController.deleteProfilePic
 );
 router.patch(
   "/updatePassword",
-  validation(validate.updatePassword),
+  validation(validators.updatePassword),
   auth(),
   userController.updatePassword
 );
-router.delete(
-  "/deleteProfile",
-  validation(validate.token),
-  auth(),
-  userController.deleteProfile
-);
-router.patch(
-  "/softDeleteProfile",
-  validation(validate.token),
-  auth(),
-  userController.softDeleteProfile
-);
-router.get(
-  "/profile",
-  validation(validate.token),
-  auth(),
-  userController.getUserById
-);
 router.patch(
   "/sendCode",
-  validation(validate.sendCode),
+  validation(validators.sendCode),
   userController.sendCode
 );
 router.patch(
   "/forgetPassword",
-  validation(validate.forgetPssword),
+  validation(validators.forgetPassword),
   userController.forgetPassword
 );
-router.get("/", userController.users);
+router.put(
+  "/",
+  validation(validators.updateUser),
+  auth(),
+  userController.updateUser
+);
+router.get("/:id", validation(validators.user), userController.user);
+router.get(
+  "/profile",
+  validation(validators.headers),
+  auth(),
+  userController.profile
+);
+router.get(
+  "/profileLink",
+  validation(validators.headers),
+  auth(),
+  userController.profileLink
+);
 export default router;

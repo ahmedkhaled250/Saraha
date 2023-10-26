@@ -1,80 +1,44 @@
+import {
+  create,
+  findById,
+  findByIdAndDelete,
+} from "../../../../DB/dbmethods.js";
 import messageModel from "../../../../DB/models/message.js";
 import userModel from "../../../../DB/models/user.js";
-
-export const addMessage = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { text } = req.body;
-    const user = await userModel.findById(id);
-    if (!user?.confirmEmail) {
-      return res.status(404).json({ message: "In-valid user" });
-    }
-    if (user.deleted) {
-      return res.status(400).json({ message: "This account is deleted" });
-    }
-    const message = await messageModel.create({ text, reciverId: user._id });
-    if (!message) {
-      return res.status(400).json({ message: "Fail to add this message" });
-    }
-    return res.status(201).json({ message: "Done", message });
-  } catch (err) {
-    return res.status(500).json({ message: "Catch error", err });
+import { asyncHandler } from "../../../services/errorHandling.js";
+export const addMessage = asyncHandler(async (req, res, next) => {
+  const { text } = req.body;
+  const { id } = req.params;
+  const receiver = await findById({ model: userModel, condition: id });
+  if (!receiver) {
+    return next(new Error("In-valid receiver", { cause: 404 }));
   }
-};
-export const deleteMessage = async (req, res) => {
-  try {
-    const { user } = req;
-    const { id } = req.params;
-    if (user.deleted) {
-      return res.status(400).json({ message: "You deleted your account" });
-    }
-    const message = await messageModel.findOneAndDelete({
-      _id: id,
-      reciverId: user._id,
-    });
-    if (!message) {
-      return res.status(404).json({ message: "In-valid this message" });
-    }
-    return res.status(200).json({ message: "Done" });
-  } catch (err) {
-    return res.status(500).json({ message: "Catch error", err });
+  await create({
+    model: messageModel,
+    data: { receiver: id, text, date: new Date() },
+  });
+  return res.status(201).json({ message: "Done" });
+});
+export const messages = asyncHandler(async (req, res, next) => {
+  const { user } = req;
+  const messages = await find({
+    model: messageModel,
+    condition: { receiver: user._id },
+  });
+  if (!messages.length) {
+    return next(new Error("In-valid messages", { cause: 404 }));
   }
-};
-export const messages = async (req, res) => {
-  try {
-    const { user } = req;
-    if (user.deleted) {
-      return res.status(400).json({ message: "You deleted your account" });
-    }
-    const messages = await messageModel
-      .find({ reciverId: user._id })
-      .select("-reciverId");
-    if (!messages.length) {
-      return res.status(404).json({ message: "In-valid messages" });
-    }
-    return res.status(200).json({ message: "Done", messages });
-  } catch (err) {
-    return res.status(500).json({ message: "Catch error", err });
+  return res.status(200).json({ message: "Done", messages });
+});
+export const deleteMessage = asyncHandler(async (req, res, next) => {
+  const { user } = req;
+  const { id } = req.params;
+  const message = await findByIdAndDelete({
+    model: messageModel,
+    condition: { receiver: user._id, _id: id },
+  });
+  if (!message) {
+    return next(new Error("In-valid message", { cause: 404 }));
   }
-};
-export const getMessageById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { user } = req;
-    if (user.deleted) {
-      return res.status(400).json({ message: "You deleted your account" });
-    }
-    const message = await messageModel
-      .findOne({ _id: id, reciverId: user._id })
-      .populate({
-        path: "reciverId",
-        select: "userName email phone age gender",
-      });
-    if (!message) {
-      return res.status(404).json({ message: "In-valid message" });
-    }
-    return res.status(200).json({ message: "Done", message });
-  } catch (err) {
-    return res.status(500).json({ message: "Catch error", err });
-  }
-};
+  return res.status(200).json({ message: "Done" });
+});

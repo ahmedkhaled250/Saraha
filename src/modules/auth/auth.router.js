@@ -1,12 +1,25 @@
 import { Router } from "express";
+import auth from "../../middlewhere/auth.js";
 import * as authController from "./controller/auth.js";
-import auth from "../../middlewear/auth.js";
-import validation from "../../middlewear/validate.js";
-import * as validate from "./auth.validate.js";
+import * as validators from "./auth.validation.js";
+import validation from "../../middlewhere/validation.js";
 const router = Router();
-router.post("/signup", validation(validate.signup), authController.signup);
-router.get("/confirmemail/:token",validation(validate.token), authController.confirmEmail);
-router.get("/Refreshtoken/:tokenRefresh",validation(validate.token), authController.refreshToken);
-router.post("/login",validation(validate.signin), authController.signin);
-router.patch("/logout" ,validation(validate.logOut), auth(), authController.logout);
+router.post("/signup", validation(validators.signup), authController.signup);
+router.patch(
+  "/confirmEmail",
+  validation(validators.token),
+  authController.confirmEmail
+);
+router.patch(
+  "/refreshToken",
+  validation(validators.token),
+  authController.refreshToken
+);
+router.post("/signin", validation(validators.signin), authController.signin);
+router.patch(
+  "/signout",
+  validation(validators.logout),
+  auth(),
+  authController.signout
+);
 export default router;

@@ -1,27 +1,21 @@
 import joi from "joi";
-export const sendCode = {
+
+export const forgetPassword = {
   body: joi
     .object()
     .required()
     .keys({
+      code: joi.string().required().min(4).max(4).messages({
+        "any.required": "code is required",
+        "string.empty": "not allowed to be empty",
+        "string.base": "only string is allowed",
+      }),
       email: joi.string().email().required().messages({
         "any.required": "Email is required",
         "string.empty": "not allowed to be empty",
         "string.base": "only string is allowed",
+        "string.email": "please enter a real email",
       }),
-    }),
-};
-export const forgetPssword = {
-  body: joi
-    .object()
-    .required()
-    .keys({
-      email: joi.string().email().required().messages({
-        "any.required": "Email is required",
-        "string.empty": "not allowed to be empty",
-        "string.base": "only string is allowed",
-      }),
-      code: joi.string().required(),
       password: joi
         .string()
         .pattern(
@@ -33,30 +27,20 @@ export const forgetPssword = {
       cPassword: joi.string().valid(joi.ref("password")).required(),
     }),
 };
-export const token = {
-  headers: joi.object().required().keys({
-    authorization: joi.string().required(),
-  }).options({allowUnknown:true}),
-};
-export const sharelinkprofile = {
-  params: joi.object().required().keys({
-    id: joi.string().required(),
-  }),
-};
-export const updateProfile = {
+export const updateUser = {
   body: joi
     .object()
     .required()
     .keys({
-      userName: joi.string(),
+      userName: joi.string().min(2).max(10).messages({
+        "string.empty": "not allowed to be empty",
+        "string.base": "only string is allowed",
+      }),
       email: joi.string().email().messages({
         "string.empty": "not allowed to be empty",
         "string.base": "only string is allowed",
-        "string.email": "please enter realy email",
+        "string.email": "please enter a real email",
       }),
-      age: joi.number(),
-      phone: joi.string(),
-      gender: joi.string(),
     }),
   headers: joi
     .object()
@@ -77,17 +61,50 @@ export const updatePassword = {
           new RegExp(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
           )
-        ),
+        )
+        .required(),
       password: joi
         .string()
         .pattern(
           new RegExp(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
           )
-        ),
+        )
+        .required(),
       cPassword: joi.string().valid(joi.ref("password")).required(),
     }),
-  headers: joi.object().required().keys({
-    authorization: joi.string().required(),
-  }).options({allowUnknown:true}),
+  headers: joi
+    .object()
+    .required()
+    .keys({
+      authorization: joi.string().required(),
+    })
+    .options({ allowUnknown: true }),
+};
+export const sendCode = {
+  body: joi
+    .object()
+    .required()
+    .keys({
+      email: joi.string().email().required().messages({
+        "any.required": "Email is required",
+        "string.empty": "not allowed to be empty",
+        "string.base": "only string is allowed",
+        "string.email": "please enter a real email",
+      }),
+    }),
+};
+export const headers = {
+  headers: joi
+    .object()
+    .required()
+    .keys({
+      authorization: joi.string().required(),
+    })
+    .options({ allowUnknown: true }),
+};
+export const user = {
+  params: joi.object().required().keys({
+    id: joi.string().required(),
+  }),
 };

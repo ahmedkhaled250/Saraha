@@ -1,13 +1,14 @@
-import { Schema, model, Types } from "mongoose";
+import { model, Schema, Types} from "mongoose";
 const messageSchema = new Schema(
   {
     text: {
       type: String,
-      required: true,
+      required: [true, "Text is required"],
     },
-    reciverId: {
-      type: Types.ObjectId,
-      ref: "User",
+    date: Date,
+    receiver:{
+      type:Types.ObjectId,
+      ref:"User"
     },
   },
   {

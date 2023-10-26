@@ -1,18 +1,19 @@
 import nodemailer from "nodemailer";
-const sendEmail = async (dest, subject, message) => {
-  let transporter = nodemailer.createTransport({
+
+const sendEmail = async ({dest, subject, message}={}) => {
+  const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.SENDEREMAIL,
-      pass: process.env.SENDERPASSWORD,
+      user: process.env.nodeMailerEmail,
+      pass: process.env.nodeMailerPassword,
     },
   });
-   let info = await transporter.sendMail({
-    from: `"Ahmed" ${process.env.SENDEREMAIL}`,
+  const info = await transporter.sendMail({
+    from: `"Ahmed 👻" ${process.env.nodeMailerEmail}`,
     to: dest,
     subject,
     html: message,
   });
   return info
 };
-export default sendEmail
+export default sendEmail;

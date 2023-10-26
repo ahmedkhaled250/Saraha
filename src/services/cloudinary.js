@@ -1,14 +1,12 @@
-import cloudinary from "cloudinary";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
 import { fileURLToPath } from "url";
-import dotenv from "dotenv"
-const __direName = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({path:path.join(__direName, "../../.env")})
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDNAME,
-  api_key: process.env.APIKEY,
-  api_secret: process.env.APISECRET,
-  secure: true,
+import path from "path";
+import dotenv from "dotenv";
+const __direname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__direname, "../../config/.env") });
+cloudinary.config({
+  cloud_name: process.env.cloud_name,
+  api_key: process.env.cloud_key,
+  api_secret: process.env.cloud_secret,
 });
-
-export default cloudinary.v2;
+export default cloudinary;

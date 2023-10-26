@@ -1,42 +1,26 @@
-import { Schema, model } from "mongoose";
+import { model, Schema } from "mongoose";
 const userSchema = new Schema(
   {
     userName: {
       type: String,
-      required: true,
+      required: [true, "userName is required"],
     },
     email: {
       type: String,
-      required: true,
-      unique: true,
+      required: [true, "Email is required"],
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Password is required"],
     },
-    code: String,
-    age: Number,
-    phone: String,
-    gender: {
-      type: String,
-      default: "Male",
-      enum: ["Male", "Female"],
-    },
-    profilePic: {
-      type: String,
-    },
-    publicId: {
-      type: String,
+    image:String,
+    imageId:String,
+    code:Number,
+    confirmEmail: {
+      type: Boolean,
+      default: false,
     },
     active: {
-      type: Boolean,
-      default: false,
-    },
-    deleted: {
-      type: Boolean,
-      default: false,
-    },
-    confirmEmail: {
       type: Boolean,
       default: false,
     },

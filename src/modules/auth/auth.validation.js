@@ -1,15 +1,20 @@
 import joi from "joi";
+
 export const signup = {
   body: joi
     .object()
     .required()
     .keys({
-      userName: joi.string().required(),
+      userName: joi.string().required().min(2).max(20).messages({
+        "any.required": "userName is required",
+        "string.empty": "not allowed to be empty",
+        "string.base": "only string is allowed",
+      }),
       email: joi.string().email().required().messages({
         "any.required": "Email is required",
         "string.empty": "not allowed to be empty",
         "string.base": "only string is allowed",
-        "string.email": "please enter realy email",
+        "string.email": "please enter a real email",
       }),
       password: joi
         .string()
@@ -20,9 +25,6 @@ export const signup = {
         )
         .required(),
       cPassword: joi.string().valid(joi.ref("password")).required(),
-      age: joi.number(),
-      phone: joi.string(),
-      gender: joi.string(),
     }),
 };
 export const signin = {
@@ -46,12 +48,7 @@ export const signin = {
         .required(),
     }),
 };
-export const token = {
-  params: joi.object().required().keys({
-    token: joi.string().required(),
-  }),
-};
-export const logOut = {
+export const logout = {
   headers: joi
     .object()
     .required()
@@ -59,4 +56,9 @@ export const logOut = {
       authorization: joi.string().required(),
     })
     .options({ allowUnknown: true }),
+};
+export const token = {
+  params: joi.object().required().keys({
+    token: joi.string().required(),
+  }),
 };
