@@ -5,38 +5,30 @@ import {
   findOneAndUpdate,
   updateOne,
 } from "../../../../DB/dbmethods.js";
-import cloudinary from "../../../services/cloudinary.js";
+import cloudinary from "../../../utils/cloudinary.js";
 import userModel from "../../../../DB/models/user.js";
 import bcrypt from "bcryptjs";
-import { asyncHandler } from "../../../services/errorHandling.js";
-import sendEmail from "../../../services/sendEmail.js";
+import { asyncHandler } from "../../../utils/errorHandling.js";
+import sendEmail from "../../../utils/sendEmail.js";
 export const profilePic = asyncHandler(async (req, res, next) => {
   const { user } = req;
-
-  if (!req.file) {
-    return next("Image is required", { cause: 400 });
-  }
-  const splitEncoding = req.file.encoding.split("bit")[0];
-  if (splitEncoding > 10) {
-    return next(new Error("image's size is very big", { cause: 400 }));
-  }
-  const { public_id, secure_url } = await cloudinary.uploader.upload(req.file, {
+  const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path, {
     folder: `Saraha/User/${user._id}`,
   });
   const updateUser = await findByIdAndUpdate({
     model: userModel,
     condition: user._id,
-    data: { image: secure_url, imageId: public_id },
+    data: { image: { public_id, secure_url } },
   });
-  if(!updateUser){
-    await cloudinary.uploader.destroy(public_id)
-    return next(new Error("Fail to upload your photo",{cause:400}))
+  if (!updateUser) {
+    await cloudinary.uploader.destroy(public_id);
+    return next(new Error("Fail to upload your photo", { cause: 400 }));
   }
-  if(updateUser){
-    if(user.image){
-      await cloudinary.uploader.destroy(user.imageId)
+  if (updateUser) {
+    if (user.image) {
+      await cloudinary.uploader.destroy(user.image.public_id);
     }
-    return res.status(200).json({message:"Done"})
+    return res.status(200).json({ message: "Done" });
   }
 });
 export const deleteProfilePic = asyncHandler(async (req, res, next) => {
@@ -44,16 +36,16 @@ export const deleteProfilePic = asyncHandler(async (req, res, next) => {
   const updateUser = await findByIdAndUpdate({
     model: userModel,
     condition: user._id,
-    data: { image: null, imageId: null },
+    data: { image: null },
   });
-  if(!updateUser){
-    return next(new Error("Fail to delete your photo",{cause:400}))
+  if (!updateUser) {
+    return next(new Error("Fail to delete your photo", { cause: 400 }));
   }
-  if(updateUser){
-    if(user.image){
-      await cloudinary.uploader.destroy(updateUser.imageId)
+  if (updateUser) {
+    if (user.image) {
+      await cloudinary.uploader.destroy(updateUser.image.public_id);
     }
-    return res.status(200).json({message:"Done"})
+    return res.status(200).json({ message: "Done" });
   }
 });
 export const updatePassword = asyncHandler(async (req, res, next) => {
@@ -141,17 +133,21 @@ export const updateUser = asyncHandler(async (req, res, next) => {
   });
   return res.status(200).json({ message: "Done" });
 });
-export const profile = asyncHandler(async(req,res,next)=>{
-  const {user}=req
-  return res.status(200).json({message:"Done",user})
-})
-export const user = asyncHandler(async(req,res,next)=>{
-  const {id}=req.params
-  const user = await findById({model:userModel,condition:id,select:"userName email image"})
-  return res.status(200).json({message:"Done",user})
-})
-export const profileLink = asyncHandler(async(req,res,next)=>{
-  const {user}=req
+export const profile = asyncHandler(async (req, res, next) => {
+  const { user } = req;
+  return res.status(200).json({ message: "Done", user });
+});
+export const user = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const user = await findById({
+    model: userModel,
+    condition: id,
+    select: "userName email image",
+  });
+  return res.status(200).json({ message: "Done", user });
+});
+export const profileLink = asyncHandler(async (req, res, next) => {
+  const { user } = req;
   const link = `${req.protocol}://${req.headers.host}/user/${user._id}`;
-  return res.status(200).json({message:"Done",link})
-})
+  return res.status(200).json({ message: "Done", link });
+});

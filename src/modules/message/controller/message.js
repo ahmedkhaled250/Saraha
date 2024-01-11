@@ -1,11 +1,12 @@
 import {
   create,
+  find,
   findById,
   findByIdAndDelete,
 } from "../../../../DB/dbmethods.js";
 import messageModel from "../../../../DB/models/message.js";
 import userModel from "../../../../DB/models/user.js";
-import { asyncHandler } from "../../../services/errorHandling.js";
+import { asyncHandler } from "../../../utils/errorHandling.js";
 export const addMessage = asyncHandler(async (req, res, next) => {
   const { text } = req.body;
   const { id } = req.params;

@@ -12,6 +12,6 @@ export const uploadPhoto = ({
     }
     cb(null, true);
   };
-  const upload = multer({ fileFilter });
+  const upload = multer({ fileFilter, storage });
   return upload;
 };

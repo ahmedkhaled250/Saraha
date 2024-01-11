@@ -13,9 +13,8 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Password is required"],
     },
-    image:String,
-    imageId:String,
-    code:Number,
+    image: { public_id: String, secure_url: String },
+    code: Number,
     confirmEmail: {
       type: Boolean,
       default: false,

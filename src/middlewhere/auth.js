@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { asyncHandler } from "../services/errorHandling.js";
+import { asyncHandler } from "../utils/errorHandling.js";
 import { findById } from "../../DB/dbmethods.js";
 import userModel from "../../DB/models/user.js";
 const auth = () => {
@@ -13,7 +13,7 @@ const auth = () => {
     if (!decoded?.id) {
       return next(new Error("In-valid payload", { cause: 400 }));
     }
-    const user = await findById({ model: userModel, condition: decoded.id,select:"email code userName" });
+    const user = await findById({ model: userModel, condition: decoded.id,select:"email code userName image" });
     if(!user){
         return next(new Error("In-valid user",{cause:404}))
     }
@@ -21,4 +21,19 @@ const auth = () => {
     return next()
   });
 };
-export default auth
+const GraphAuth = async(authorization) => {
+    if (!authorization.startsWith(process.env.BARERKEY)) {
+      return new Error("In-valid barer key");
+    }
+    const token = authorization.split(process.env.BARERKEY)[1];
+    const decoded = jwt.verify(token, process.env.TOKENSEGNITURE);
+    if (!decoded?.id) {
+      return new Error("In-valid payload");
+    }
+    const user = await findById({ model: userModel, condition: decoded.id,select:"email code userName image" });
+    if(!user){
+        return new Error("In-valid user")
+    }
+    return user
+};
+export {auth ,GraphAuth}

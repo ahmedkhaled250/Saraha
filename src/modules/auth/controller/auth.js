@@ -1,4 +1,4 @@
-import { asyncHandler } from "../../../services/errorHandling.js";
+import { asyncHandler } from "../../../utils/errorHandling.js";
 import {
   findByIdAndUpdate,
   findOne,
@@ -7,14 +7,14 @@ import {
 import userModel from "../../../../DB/models/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import sendEmail from "../../../services/sendEmail.js";
+import sendEmail from "../../../utils/sendEmail.js";
 export const signup = asyncHandler(async (req, res, next) => {
   const { email, password,userName } = req.body;
   const checkEmail = await findOne({ model: userModel, condition: { email } });
   if (checkEmail) {
     return next(new Error("Dupplicate error", { cause: 403 }));
   }
-  const hash = bcrypt.hashSync(password, process.env.SALTROUND);
+  const hash = bcrypt.hashSync(password, parseInt(process.env.SALTROUND));
   const newUser = new userModel({ email, password: hash,userName });
   const token = jwt.sign({ id: newUser._id }, process.env.EMAILTOKEN, {
     expiresIn: 60 * 60,

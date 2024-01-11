@@ -1,17 +1,17 @@
 import { Router } from "express";
-import auth from "../../middlewhere/auth.js";
+import {auth} from "../../middlewhere/auth.js";
 import * as authController from "./controller/auth.js";
 import * as validators from "./auth.validation.js";
 import validation from "../../middlewhere/validation.js";
 const router = Router();
 router.post("/signup", validation(validators.signup), authController.signup);
-router.patch(
-  "/confirmEmail",
+router.get(
+  "/confirmEmail/:token",
   validation(validators.token),
   authController.confirmEmail
 );
-router.patch(
-  "/refreshToken",
+router.get(
+  "/refreshToken/token",
   validation(validators.token),
   authController.refreshToken
 );

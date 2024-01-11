@@ -1,64 +1,41 @@
 import joi from "joi";
+import { generalFields } from "../../middlewhere/validation.js";
 
-export const signup = {
-  body: joi
-    .object()
-    .required()
-    .keys({
-      userName: joi.string().required().min(2).max(20).messages({
-        "any.required": "userName is required",
-        "string.empty": "not allowed to be empty",
-        "string.base": "only string is allowed",
-      }),
-      email: joi.string().email().required().messages({
-        "any.required": "Email is required",
-        "string.empty": "not allowed to be empty",
-        "string.base": "only string is allowed",
-        "string.email": "please enter a real email",
-      }),
-      password: joi
-        .string()
-        .pattern(
-          new RegExp(
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-          )
-        )
-        .required(),
-      cPassword: joi.string().valid(joi.ref("password")).required(),
+export const signup = joi
+  .object({
+    userName: joi.string().required().min(2).max(20).messages({
+      "any.required": "userName is required",
+      "string.empty": "not allowed to be empty",
+      "string.base": "only string is allowed",
     }),
-};
-export const signin = {
-  body: joi
-    .object()
-    .required()
-    .keys({
-      email: joi.string().email().required().messages({
-        "any.required": "Email is required",
-        "string.empty": "not allowed to be empty",
-        "string.base": "only string is allowed",
-        "string.email": "please enter realy email",
-      }),
-      password: joi
-        .string()
-        .pattern(
-          new RegExp(
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-          )
-        )
-        .required(),
+    email: generalFields.email.messages({
+      "any.required": "Email is required",
+      "string.empty": "not allowed to be empty",
+      "string.base": "only string is allowed",
+      "string.email": "please enter a real email",
     }),
-};
-export const logout = {
-  headers: joi
-    .object()
-    .required()
-    .keys({
-      authorization: joi.string().required(),
-    })
-    .options({ allowUnknown: true }),
-};
-export const token = {
-  params: joi.object().required().keys({
+    password: generalFields.password,
+    cPassword: generalFields.cPassword.valid(joi.ref("password")),
+  })
+  .required();
+export const signin = joi
+  .object({
+    email: generalFields.email.messages({
+      "any.required": "Email is required",
+      "string.empty": "not allowed to be empty",
+      "string.base": "only string is allowed",
+      "string.email": "please enter realy email",
+    }),
+    password: generalFields.password
+  })
+  .required();
+export const logout = joi
+  .object({
+    authorization:generalFields.headers,
+  })
+  .required();
+export const token = joi
+  .object({
     token: joi.string().required(),
-  }),
-};
+  })
+  .required();
