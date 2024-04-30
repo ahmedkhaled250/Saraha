@@ -15,6 +15,7 @@ export const signup = joi
       "string.email": "please enter a real email",
     }),
     password: generalFields.password,
+    gender:joi.string().allow("Male","Female"),
     cPassword: generalFields.cPassword.valid(joi.ref("password")),
   })
   .required();

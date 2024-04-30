@@ -10,6 +10,7 @@ import userModel from "../../../../DB/models/user.js";
 import bcrypt from "bcryptjs";
 import { asyncHandler } from "../../../utils/errorHandling.js";
 import sendEmail from "../../../utils/sendEmail.js";
+import jwt from "jsonwebtoken"
 export const profilePic = asyncHandler(async (req, res, next) => {
   const { user } = req;
   const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path, {
@@ -55,7 +56,7 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
   if (!match) {
     return next(new Error("Password miss match", { cause: 400 }));
   }
-  const hash = bcrypt.hashSync(password, process.env.SALTROUND);
+  const hash = bcrypt.hashSync(password, parseInt(process.env.SALTROUND));
   await updateOne({
     model: userModel,
     condition: { _id: user._id },
@@ -89,7 +90,7 @@ export const forgetPassword = asyncHandler(async (req, res, next) => {
   if (code != user.code) {
     return next(new Error("This code is wrong", { cause: 400 }));
   }
-  const hash = bcrypt.hashSync(password, process.env.SALTROUND);
+  const hash = bcrypt.hashSync(password, parseInt(process.env.SALTROUND));
   await updateOne({
     model: userModel,
     condition: { email },
@@ -97,8 +98,18 @@ export const forgetPassword = asyncHandler(async (req, res, next) => {
   });
   return res.status(200).json({ message: "Go to login" });
 });
+export const softdelete = asyncHandler(async (req, res, next) => {
+  const { user } = req;
+  if (user.stopped) {
+    user.stopped = false
+  } else {
+    user.stopped = true
+  }
+  await user.save()
+  return res.status(200).json({ message: "Done" });
+});
 export const updateUser = asyncHandler(async (req, res, next) => {
-  const { email, userName } = req.body;
+  const { email, userName, gender } = req.body;
   const { user } = req;
   if (email) {
     if (email === user.email) {
@@ -115,7 +126,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
               <br>
               <a href="${link2}">Request new Confirmation email</a>
               `;
-    const info = await sendEmail({
+    await sendEmail({
       dest: email,
       subject: "confirm email",
       message,
@@ -123,13 +134,13 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     await updateOne({
       model: userModel,
       condition: { _id: user._id },
-      data: { active: false, confirmEmail: false, email, userName },
+      data: { active: false, confirmEmail: false, changeTime: new Date(), email, gender, userName },
     });
   }
   await updateOne({
     model: userModel,
     condition: { _id: user._id },
-    data: { userName },
+    data: { userName, gender },
   });
   return res.status(200).json({ message: "Done" });
 });
@@ -142,7 +153,6 @@ export const user = asyncHandler(async (req, res, next) => {
   const user = await findById({
     model: userModel,
     condition: id,
-    select: "userName email image",
   });
   return res.status(200).json({ message: "Done", user });
 });

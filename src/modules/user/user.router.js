@@ -36,6 +36,12 @@ router.patch(
   validation(validators.forgetPassword),
   userController.forgetPassword
 );
+router.patch(
+  "/softdelete",
+  validation(validators.headers),
+  auth(),
+  userController.softdelete
+);
 router.put(
   "/",
   validation(validators.updateUser),
@@ -43,9 +49,21 @@ router.put(
   userController.updateUser
 );
 router.get(
+  "/",
+  validation(validators.headers),
+  auth(),
+  userController.profile
+);
+router.get(
   "/profileLink",
   validation(validators.headers),
   auth(),
   userController.profileLink
 );
+router.get(
+  "/:id",
+  validation(validators.getUserById),
+  userController.user
+);
+
 export default router;

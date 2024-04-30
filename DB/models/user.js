@@ -13,12 +13,21 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Password is required"],
     },
+    gender: {
+      type: String,
+      enum: ["Male", "Female"]
+    },
     image: { public_id: String, secure_url: String },
     code: Number,
     confirmEmail: {
       type: Boolean,
       default: false,
     },
+    stopped: {
+      type: Boolean,
+      default: false,
+    },
+    changeTime: Date,
     active: {
       type: Boolean,
       default: false,

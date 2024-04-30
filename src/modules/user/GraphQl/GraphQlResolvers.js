@@ -29,7 +29,6 @@ export const getUserByIdResolver = {
     const { id } = args;
     const isValid = graphQlValidation(getUserById, args);
     if (isValid.error) {
-      console.log("fffffff");
       throw new Error(isValid.error);
     }
 

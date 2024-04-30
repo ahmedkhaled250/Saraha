@@ -9,13 +9,13 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import sendEmail from "../../../utils/sendEmail.js";
 export const signup = asyncHandler(async (req, res, next) => {
-  const { email, password,userName } = req.body;
+  const { email, password, userName, gender } = req.body;
   const checkEmail = await findOne({ model: userModel, condition: { email } });
   if (checkEmail) {
-    return next(new Error("Dupplicate error", { cause: 403 }));
+    return next(new Error("Email exist", { cause: 409 }));
   }
   const hash = bcrypt.hashSync(password, parseInt(process.env.SALTROUND));
-  const newUser = new userModel({ email, password: hash,userName });
+  const newUser = new userModel({ email, password: hash, userName, gender });
   const token = jwt.sign({ id: newUser._id }, process.env.EMAILTOKEN, {
     expiresIn: 60 * 60,
   });
@@ -78,9 +78,12 @@ export const signin = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new Error("In-valid user", { cause: 404 }));
   }
-  const match = bcrypt.compare(password, user.password);
-  if(!match){
-    return next(new Error("Password miss match",{cause:400}))
+  if (!user.confirmEmail) {
+    return next(new Error("Confirm your email first", { cause: 400 }));
+  }
+  const match = bcrypt.compareSync(password, user.password);
+  if (!match) {
+    return next(new Error("Password miss match", { cause: 400 }))
   }
   await updateOne({
     model: userModel,
@@ -93,7 +96,9 @@ export const signin = asyncHandler(async (req, res, next) => {
   return res.status(200).json({ message: "Done", token });
 });
 export const signout = asyncHandler(async (req, res, next) => {
-  const {user} = req;
-  await updateOne({model:userModel,condition:{_id:user._id},data:{active:false}})
-  return res.status(200).json({message:"Done"})
+  const { user } = req;
+  user.active = false
+  user.changeTime = new Date()
+  await user.save()
+  return res.status(200).json({ message: "Done" })
 });

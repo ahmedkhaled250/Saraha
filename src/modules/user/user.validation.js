@@ -3,10 +3,8 @@ import { generalFields } from "../../middlewhere/validation.js";
 
 export const forgetPassword = joi
   .object({
-    code: joi.string().required().min(4).max(4).messages({
+    code: joi.number().required().min(1000).max(9999).messages({
       "any.required": "code is required",
-      "string.empty": "not allowed to be empty",
-      "string.base": "only string is allowed",
     }),
     email: generalFields.email.messages({
       "any.required": "Email is required",
@@ -20,7 +18,7 @@ export const forgetPassword = joi
   .required();
 export const updateUser = joi
   .object({
-    userName: joi.string().min(2).max(10).messages({
+    userName: joi.string().min(2).max(20).messages({
       "string.empty": "not allowed to be empty",
       "string.base": "only string is allowed",
     }),
@@ -29,6 +27,7 @@ export const updateUser = joi
       "string.base": "only string is allowed",
       "string.email": "please enter a real email",
     }),
+    gender: joi.string().allow("Male", "Female"),
     authorization: generalFields.headers,
   })
   .required();
@@ -59,11 +58,6 @@ export const profilePic = joi
   .object({
     authorization: generalFields.headers,
     file: generalFields.file.required(),
-  })
-  .required();
-export const user = joi
-  .object({
-    id: generalFields.id,
   })
   .required();
 export const getUserById = joi

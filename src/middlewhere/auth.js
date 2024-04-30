@@ -13,7 +13,11 @@ const auth = () => {
     if (!decoded?.id) {
       return next(new Error("In-valid payload", { cause: 400 }));
     }
-    const user = await findById({ model: userModel, condition: decoded.id,select:"email code userName image" });
+    const user = await findById({ model: userModel, condition: decoded.id, select: "-password" });
+    const expireDate = parseInt(user.changeTime?.getTime() / 1000);
+    if (expireDate > decoded.iat) {
+      return next(new Error("Expire token", { cause: 400 }));
+    }
     if(!user){
         return next(new Error("In-valid user",{cause:404}))
     }
@@ -30,10 +34,11 @@ const GraphAuth = async(authorization) => {
     if (!decoded?.id) {
       return new Error("In-valid payload");
     }
-    const user = await findById({ model: userModel, condition: decoded.id,select:"email code userName image" });
-    if(!user){
-        return new Error("In-valid user")
-    }
+  const user = await findById({ model: userModel, condition: decoded.id, select: "email code userName image" });
+  if(!user){
+    return new Error("In-valid user")
+  }
+
     return user
 };
 export {auth ,GraphAuth}
