@@ -8,6 +8,7 @@ export const addMessage = joi
       "string.base": "only string is allowed",
     }),
     id: generalFields.id,
+    authorization: generalFields.headers,
   })
   .required();
 export const deleteMessage = joi

@@ -15,4 +15,10 @@ router.delete(
   auth(),
   messageController.deleteMessage
 );
+router.get(
+  "/",
+  validation(validators.allMessages),
+  auth(),
+  messageController.messages
+);
 export default router;
