@@ -5,11 +5,18 @@ import messageRouter from "./message/message.router.js";
 // import graphUserSchema from "./user/GraphQl/GraphQlSchema.js";
 import express from "express";
 import cors from "cors";
+import morgan from "morgan";
 import { globalError } from "../utils/errorHandling.js";
 // import { createHandler } from "graphql-http/lib/use/express";
 const appRouter = (app) => {
   app.use(cors());
   app.use(express.json());
+  // morgan check error
+  if (process.env.MOOD == "DEV") {
+    app.use(morgan("dev"));
+  } else {
+    app.use(morgan("combined"));
+  }
   // app.use("/messageGraphQl", createHandler({ schema: graphMessageSchema }));
   // app.use("/userGraphQl", createHandler({ schema: graphUserSchema }));
   app.use(`/auth`, authRouter);

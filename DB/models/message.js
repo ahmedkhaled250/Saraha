@@ -8,6 +8,11 @@ const messageSchema = new Schema(
     date: Date,
     receiver:{
       type:Types.ObjectId,
+      ref: "User",
+      required:[true,"Receiver is required"]
+    },
+    sender:{
+      type:Types.ObjectId,
       ref:"User"
     },
   },

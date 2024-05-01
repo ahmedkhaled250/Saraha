@@ -35,6 +35,11 @@ export const generalFields = {
   }),
   headers: joi.string().required(),
 };
+export const validateQuery = {
+  page: joi.number(),
+  size: joi.number(),
+  sort: joi.string(),
+};
 const validation = (schema) => {
   return async (req, res, next) => {
     const dataInputs = {

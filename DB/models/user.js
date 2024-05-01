@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { model,Schema, Types } from "mongoose";
 const userSchema = new Schema(
   {
     userName: {
@@ -32,6 +32,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    wishList: {
+      type: [Types.ObjectId],
+      ref: "Message",
+    }
   },
   {
     timestamps: true,
