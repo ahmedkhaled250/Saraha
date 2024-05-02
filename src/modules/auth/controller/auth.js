@@ -1,5 +1,6 @@
 import { asyncHandler } from "../../../utils/errorHandling.js";
 import {
+  findById,
   findByIdAndUpdate,
   findOne,
   updateOne,
