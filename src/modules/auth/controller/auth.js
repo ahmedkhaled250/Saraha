@@ -94,7 +94,7 @@ export const signin = asyncHandler(async (req, res, next) => {
   const token = jwt.sign({ id: user._id }, process.env.TOKENSEGNITURE, {
     expiresIn: "1d",
   });
-  return res.status(200).json({ message: "Done", token });
+  return res.status(200).json({ message: "Done", token, id:user._id });
 });
 export const signout = asyncHandler(async (req, res, next) => {
   const { user } = req;
