@@ -11,7 +11,7 @@ router.get(
   authController.confirmEmail
 );
 router.get(
-  "/refreshToken/token",
+  "/refreshToken/:token",
   validation(validators.token),
   authController.refreshToken
 );
