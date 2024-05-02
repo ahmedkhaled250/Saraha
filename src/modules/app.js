@@ -9,7 +9,7 @@ import morgan from "morgan";
 import { globalError } from "../utils/errorHandling.js";
 // import { createHandler } from "graphql-http/lib/use/express";
 const appRouter = (app) => {
-  app.use(cors({}));
+  app.use(cors());
   app.use(express.json());
   // morgan check error
   if (process.env.MOOD == "DEV") {

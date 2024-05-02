@@ -53,7 +53,7 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new Error("In-valid user", { cause: 404 }));
   }
-  return res.status(200).json({ message: "Done" });
+  return res.status(200).redirect(process.env.LOGINPAGE)
 });
 export const refreshToken = asyncHandler(async (req, res, next) => {
   const { token } = req.params;
