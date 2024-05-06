@@ -111,6 +111,7 @@ export const softdelete = asyncHandler(async (req, res, next) => {
 export const updateUser = asyncHandler(async (req, res, next) => {
   const { email, userName, gender } = req.body;
   const { user } = req;
+  let updateUser;
   if (email) {
     if (email === user.email) {
       return next(new Error("Already, this is your email", { cause: 403 }));
@@ -131,18 +132,21 @@ export const updateUser = asyncHandler(async (req, res, next) => {
       subject: "confirm email",
       message,
     });
-    await updateOne({
+    updateUser = await findByIdAndUpdate({
       model: userModel,
       condition: { _id: user._id },
       data: { active: false, confirmEmail: false, changeTime: new Date(), email, gender, userName },
+      option: { new: true }
+    });
+  } else {
+    updateUser = await findByIdAndUpdate({
+      model: userModel,
+      condition: { _id: user._id },
+      data: { userName, gender },
+      option: { new: true }
     });
   }
-  await updateOne({
-    model: userModel,
-    condition: { _id: user._id },
-    data: { userName, gender },
-  });
-  return res.status(200).json({ message: "Done" });
+  return res.status(200).json({ message: "Done", user : updateUser });
 });
 export const profile = asyncHandler(async (req, res, next) => {
   const { user } = req;
@@ -158,6 +162,10 @@ export const user = asyncHandler(async (req, res, next) => {
 });
 export const profileLink = asyncHandler(async (req, res, next) => {
   const { user } = req;
-  const link = `${req.protocol}://${req.headers.host}/user/${user._id}`;
+  const link = `${req.protocol}://${req.headers.host}/user/${user._id}/sendMessage`;
   return res.status(200).json({ message: "Done", link });
 });
+export const redirectToSendMessage = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  return res.status(200).redirect(process.env.SENDMESSAGE)
+})
