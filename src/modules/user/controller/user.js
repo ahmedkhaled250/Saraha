@@ -146,7 +146,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
       option: { new: true }
     });
   }
-  return res.status(200).json({ message: "Done", user : updateUser });
+  return res.status(200).json({ message: "Done", user: updateUser });
 });
 export const profile = asyncHandler(async (req, res, next) => {
   const { user } = req;
@@ -162,10 +162,6 @@ export const user = asyncHandler(async (req, res, next) => {
 });
 export const profileLink = asyncHandler(async (req, res, next) => {
   const { user } = req;
-  const link = `${req.protocol}://${req.headers.host}/user/${user._id}/sendMessage`;
+  const link = `${process.env.SENDMESSAGE}?userId=${user._id}`
   return res.status(200).json({ message: "Done", link });
 });
-export const redirectToSendMessage = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  return res.status(200).redirect(process.env.SENDMESSAGE)
-})

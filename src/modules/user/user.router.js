@@ -61,11 +61,6 @@ router.get(
   userController.profileLink
 );
 router.get(
-  "/:id/sendMessage",
-  validation(validators.getUserById),
-  userController.redirectToSendMessage
-);
-router.get(
   "/:id",
   validation(validators.getUserById),
   userController.user
