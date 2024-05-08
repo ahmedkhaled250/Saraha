@@ -16,6 +16,7 @@ export const profilePic = asyncHandler(async (req, res, next) => {
   const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path, {
     folder: `Saraha/User/${user._id}`,
   });
+  console.log(public_id);
   const updateUser = await findByIdAndUpdate({
     model: userModel,
     condition: user._id,

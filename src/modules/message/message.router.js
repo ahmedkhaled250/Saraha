@@ -7,7 +7,7 @@ import wishListRouter from "../wishList/wishList.router.js"
 const router = Router({ mergeParams: true });
 router.use("/:id/wishList", wishListRouter);
 router.post(
-  "/unAuthonticated",
+  "/sendMessage",
   validation(validators.addMessage),
   messageController.addMessage
 );
