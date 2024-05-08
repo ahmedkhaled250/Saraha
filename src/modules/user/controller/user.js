@@ -155,9 +155,13 @@ export const profile = asyncHandler(async (req, res, next) => {
 });
 export const user = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
+  const populate = [{
+    path: "wishList"
+  }]
   const user = await findById({
     model: userModel,
     condition: id,
+    populate
   });
   return res.status(200).json({ message: "Done", user });
 });

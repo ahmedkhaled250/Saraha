@@ -13,7 +13,10 @@ const auth = () => {
     if (!decoded?.id) {
       return next(new Error("In-valid payload", { cause: 400 }));
     }
-    const user = await findById({ model: userModel, condition: decoded.id, select: "-password" });
+    const populate = [{
+      path: "wishList"
+    }]
+    const user = await findById({ model: userModel, condition: decoded.id, select: "-password",populate });
     const expireDate = parseInt(user.changeTime?.getTime() / 1000);
     if (expireDate > decoded.iat) {
       return next(new Error("Expire token", { cause: 400 }));
