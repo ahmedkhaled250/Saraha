@@ -4,6 +4,7 @@ import {
   findById,
   findByIdAndDelete,
   findOne,
+  updateOne,
 } from "../../../../DB/dbmethods.js";
 import messageModel from "../../../../DB/models/message.js";
 import userModel from "../../../../DB/models/user.js";
@@ -91,6 +92,15 @@ export const deleteMessage = asyncHandler(async (req, res, next) => {
   });
   if (!message) {
     return next(new Error("In-valid message", { cause: 404 }));
+  }
+  const messageIds = []
+  if (user.wishList.length) {
+    for (const message of user.wishList) {
+      messageIds.push(message._id.toString())
+    }
+  }
+  if (messageIds.includes(message._id)) {
+    await updateOne({ model: userModel, condition: { _id: user._id }, data: { $pull: { wishList: message._id } } })
   }
   return res.status(200).json({ message: "Done" });
 });
