@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from "cloudinary";
+import cloudinary  from "cloudinary";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -11,7 +11,7 @@ cloudinary.config({
   secure: true
 });
 
-export default cloudinary;
+export default cloudinary.v2;
 
 
 

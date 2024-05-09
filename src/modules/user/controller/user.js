@@ -13,7 +13,7 @@ import sendEmail from "../../../utils/sendEmail.js";
 import jwt from "jsonwebtoken"
 export const profilePic = asyncHandler(async (req, res, next) => {
   const { user } = req;
-  const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path, {
+  const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path, { 
     folder: `Saraha/User/${user._id}`,
   });
   console.log(public_id);
@@ -22,6 +22,7 @@ export const profilePic = asyncHandler(async (req, res, next) => {
     condition: user._id,
     data: { image: { public_id, secure_url } },
   });
+  console.log(updateUser);
   if (!updateUser) {
     await cloudinary.uploader.destroy(public_id);
     return next(new Error("Fail to upload your photo", { cause: 400 }));
@@ -44,7 +45,7 @@ export const deleteProfilePic = asyncHandler(async (req, res, next) => {
     return next(new Error("Fail to delete your photo", { cause: 400 }));
   }
   if (updateUser) {
-    if (user.image) {
+    if (user.image != "MongooseDocument { null }") {
       await cloudinary.uploader.destroy(updateUser.image.public_id);
     }
     return res.status(200).json({ message: "Done" });
