@@ -15,10 +15,10 @@ export const add = asyncHandler(async (req, res, next) => {
   const messageIds = []
   if (user.wishList.length) {
     for (const message of user.wishList) {
-      messageIds.push(message._id)
+      messageIds.push(message._id.toString())
     }
   }
-  if (messageIds.includes(message._id)) {
+  if (messageIds.includes(message._id.toString())) {
     return next(new Error("this message in your wishlist", { cause: 400 }))
   }
   await updateOne({
@@ -42,10 +42,10 @@ export const remove = asyncHandler(async (req, res, next) => {
   const messageIds = []
   if (user.wishList.length) {
     for (const message of user.wishList) {
-      messageIds.push(message._id)
+      messageIds.push(message._id.toString())
     }
   }
-  if (!messageIds.includes(message._id)) {
+  if (!messageIds.includes(message._id.toString())) {
     return next(new Error("This message is not in your wishList", { cause: 400 }));
   }
   await updateOne({
