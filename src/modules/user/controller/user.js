@@ -28,7 +28,7 @@ export const profilePic = asyncHandler(async (req, res, next) => {
     return next(new Error("Fail to upload your photo", { cause: 400 }));
   }
   if (updateUser) {
-    if (user.image) {
+    if (user.image !="MongooseDocument { null }") {
       await cloudinary.uploader.destroy(user.image.public_id);
     }
     return res.status(200).json({ message: "Done" });

@@ -12,7 +12,13 @@ export const add = asyncHandler(async (req, res, next) => {
   if (!message) {
     return next(new Error("In-valid message id", { cause: 404 }));
   }
-  if (user.wishList.includes(message._id)) {
+  const messageIds = []
+  if (user.wishList.length) {
+    for (const message of user.wishList) {
+      messageIds.push(message._id)
+    }
+  }
+  if (messageIds.includes(message._id)) {
     return next(new Error("this message in your wishlist", { cause: 400 }))
   }
   await updateOne({
@@ -33,7 +39,13 @@ export const remove = asyncHandler(async (req, res, next) => {
   if (!message) {
     return next(new Error("In-valid message id", { cause: 404 }));
   }
-  if (!user.wishList.includes(message._id)) {
+  const messageIds = []
+  if (user.wishList.length) {
+    for (const message of user.wishList) {
+      messageIds.push(message._id)
+    }
+  }
+  if (!messageIds.includes(message._id)) {
     return next(new Error("This message is not in your wishList", { cause: 400 }));
   }
   await updateOne({
