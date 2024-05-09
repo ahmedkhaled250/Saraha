@@ -12,6 +12,9 @@ export const add = asyncHandler(async (req, res, next) => {
   if (!message) {
     return next(new Error("In-valid message id", { cause: 404 }));
   }
+  if (user.wishList.includes(message._id)) {
+    return next(new Error("this message in your wishlist", { cause: 400 }))
+  }
   await updateOne({
     model: userModel,
     condition: { _id: user._id },
