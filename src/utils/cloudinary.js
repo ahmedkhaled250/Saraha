@@ -8,7 +8,7 @@ cloudinary.config({
   cloud_name: process.env.cloud_name,
   api_key: process.env.cloud_key,
   api_secret: process.env.cloud_secret,
-  secure: true
+  secure: true 
 });
 
 export default cloudinary.v2;

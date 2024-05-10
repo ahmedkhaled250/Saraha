@@ -11,3 +11,14 @@ const app = express();
 appRouter(app);
 connectDB();
 app.listen(port, () => console.log(`Running...............${port}`));
+
+// const app = express()
+
+// app.use
+// app.post
+// app.put
+// app.patch
+// app.delete
+// app.get
+
+// app.listen(5000, () => console.log("Running...............5000"))

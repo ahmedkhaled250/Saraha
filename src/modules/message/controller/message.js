@@ -52,7 +52,6 @@ export const receivedMessages = asyncHandler(async (req, res, next) => {
     req.query,
     messageModel.find({ receiver: user._id }).populate(populate).select("-sender")
   )
-    .paginate()
     .sort()
   const messages = await apiFeature.mongooseQuery;
   if (!messages.length) {

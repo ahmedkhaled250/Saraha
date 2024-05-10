@@ -8,4 +8,4 @@ const paginate = ({ page = 1, size = 2 } = {}) => {
   const skip = (parseInt(page) - 1) * parseInt(size)
   return { limit: parseInt(size), skip };
 };
-export default paginate;
+export default paginate; 
