@@ -3,6 +3,7 @@ import {
   find,
   findById,
   findByIdAndDelete,
+  findByIdAndUpdate,
   findOne,
   updateOne,
 } from "../../../../DB/dbmethods.js";
@@ -45,7 +46,7 @@ export const receivedMessages = asyncHandler(async (req, res, next) => {
   const populate = [
     {
       path: "receiver",
-      select: "userName email image",
+      select: "userName email image userLink",
     },
   ]
   const apiFeature = new ApiFeatures(
@@ -85,21 +86,29 @@ export const sentMessages = asyncHandler(async (req, res, next) => {
 export const deleteMessage = asyncHandler(async (req, res, next) => {
   const { user } = req;
   const { id } = req.params;
+  const sentMessage = await findByIdAndUpdate({
+    model: messageModel,
+    condition: { sender: user._id, _id: id },
+    data:{sender:null}
+  });
+  if (sentMessage) {
+    return res.status(200).json({ message: "Done" });
+  }
   const message = await findByIdAndDelete({
     model: messageModel,
     condition: { receiver: user._id, _id: id },
   });
-  if (!message) {
-    return next(new Error("In-valid message", { cause: 404 }));
-  }
-  const messageIds = []
-  if (user.wishList.length) {
-    for (const message of user.wishList) {
-      messageIds.push(message._id.toString())
+  if (message) {
+    const messageIds = []
+    if (user.wishList.length) {
+      for (const message of user.wishList) {
+        messageIds.push(message._id.toString())
+      }
     }
+    if (messageIds.includes(message._id)) {
+      await updateOne({ model: userModel, condition: { _id: user._id }, data: { $pull: { wishList: message._id } } })
+    }
+    return res.status(200).json({ message: "Done" });
   }
-  if (messageIds.includes(message._id)) {
-    await updateOne({ model: userModel, condition: { _id: user._id }, data: { $pull: { wishList: message._id } } })
-  }
-  return res.status(200).json({ message: "Done" });
+  return next(new Error("In-valid message", { cause: 404 }));
 });

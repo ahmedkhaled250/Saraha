@@ -19,7 +19,7 @@ export const add = asyncHandler(async (req, res, next) => {
     }
   }
   if (messageIds.includes(message._id.toString())) {
-    return next(new Error("this message in your wishlist", { cause: 400 }))
+    return next(new Error("this message is in your wishlist", { cause: 400 }))
   }
   await updateOne({
     model: userModel,

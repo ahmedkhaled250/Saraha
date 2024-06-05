@@ -1,12 +1,22 @@
-import { model,Schema, Types } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 const userSchema = new Schema(
   {
     userName: {
       type: String,
       required: [true, "userName is required"],
     },
+    linkName: {
+      type: String,
+      required: [true, "linkName is required"],
+      unique: [true, "linkName must be unique value"],
+    },
+    userLink: {
+      type: String,
+      unique: [true, "linkName must be unique value"],
+    },
     email: {
       type: String,
+      unique: [true, "email must be unique value"],
       required: [true, "Email is required"],
     },
     password: {

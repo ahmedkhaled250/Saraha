@@ -22,6 +22,10 @@ export const updateUser = joi
       "string.empty": "not allowed to be empty",
       "string.base": "only string is allowed",
     }),
+    linkName: joi.string().min(2).max(20).messages({
+      "string.empty": "not allowed to be empty",
+      "string.base": "only string is allowed",
+    }),
     email: joi.string().email().messages({
       "string.empty": "not allowed to be empty",
       "string.base": "only string is allowed",
@@ -60,8 +64,12 @@ export const profilePic = joi
     file: generalFields.file.required(),
   })
   .required();
-export const getUserById = joi
+export const getUserByUserName = joi
   .object({
-    id: generalFields.id,
+    userName: joi.string().required().min(2).max(20).messages({
+      "any.required": "linkName is required",
+      "string.empty": "not allowed to be empty",
+      "string.base": "only string is allowed",
+    }),
   })
   .required();

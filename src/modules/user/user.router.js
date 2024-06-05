@@ -48,6 +48,7 @@ router.put(
   auth(),
   userController.updateUser
 );
+
 router.get(
   "/",
   validation(validators.headers),
@@ -55,15 +56,8 @@ router.get(
   userController.profile
 );
 router.get(
-  "/profileLink",
-  validation(validators.headers),
-  auth(),
-  userController.profileLink
-);
-router.get(
-  "/:id",
-  validation(validators.getUserById),
+  "/:userName",
+  validation(validators.getUserByUserName),
   userController.user
 );
-
 export default router;

@@ -12,23 +12,19 @@ import { asyncHandler } from "../../../utils/errorHandling.js";
 import sendEmail from "../../../utils/sendEmail.js";
 import jwt from "jsonwebtoken"
 export const profilePic = asyncHandler(async (req, res, next) => {
+  console.log("cfkuyuk");
   const { user } = req;
-  const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path, { 
+  console.log(user);
+  const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path, {
     folder: `Saraha/User/${user._id}`,
   });
-  console.log(public_id);
   const updateUser = await findByIdAndUpdate({
     model: userModel,
     condition: user._id,
     data: { image: { public_id, secure_url } },
   });
-  console.log(updateUser);
-  if (!updateUser) {
-    await cloudinary.uploader.destroy(public_id);
-    return next(new Error("Fail to upload your photo", { cause: 400 }));
-  }
   if (updateUser) {
-    if (user.image !="MongooseDocument { null }") {
+    if (user.image != "MongooseDocument { null }") {
       await cloudinary.uploader.destroy(user.image.public_id);
     }
     return res.status(200).json({ message: "Done" });
@@ -89,6 +85,9 @@ export const forgetPassword = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new Error("In-valid user", { cause: 404 }));
   }
+  if (!user.confirmEmail) {
+    return next(new Error("Confirm your email first", { cause: 400 }));
+  }
   if (code != user.code) {
     return next(new Error("This code is wrong", { cause: 400 }));
   }
@@ -98,7 +97,10 @@ export const forgetPassword = asyncHandler(async (req, res, next) => {
     condition: { email },
     data: { password: hash, code: null },
   });
-  return res.status(200).json({ message: "Go to login" });
+  const token = jwt.sign({ id: user._id }, process.env.TOKENSEGNITURE, {
+    expiresIn: "1d",
+  });
+  return res.status(200).json({ message: "Done", token });
 });
 export const softdelete = asyncHandler(async (req, res, next) => {
   const { user } = req;
@@ -111,12 +113,23 @@ export const softdelete = asyncHandler(async (req, res, next) => {
   return res.status(200).json({ message: "Done" });
 });
 export const updateUser = asyncHandler(async (req, res, next) => {
-  const { email, userName, gender } = req.body;
+  const { email, userName, gender, linkName } = req.body;
   const { user } = req;
   let updateUser;
-  if (email) {
-    if (email === user.email) {
-      return next(new Error("Already, this is your email", { cause: 403 }));
+  let userLink
+  if (linkName) {
+    if (linkName != user.linkName) {
+      const checkLinkName = await findOne({ model: userModel, condition: { linkName } })
+      if (checkLinkName) {
+        return next(new Error("linkNamw exist", { cause: 409 }));
+      }
+      userLink = `${process.env.SENDMESSAGE}?userName=${linkName}`
+    }
+  }
+  if (email && email != user.email) {
+    const checkEmail = await findOne({ model: userModel, condition: { email } });
+    if (checkEmail) {
+      return next(new Error("Email exist", { cause: 409 }));
     }
     const token = jwt.sign({ id: user._id }, process.env.EMAILTOKEN, {
       expiresIn: 60 * 60,
@@ -137,14 +150,14 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     updateUser = await findByIdAndUpdate({
       model: userModel,
       condition: { _id: user._id },
-      data: { active: false, confirmEmail: false, changeTime: new Date(), email, gender, userName },
+      data: { active: false, confirmEmail: false, changeTime: new Date(), userLink, email, linkName, gender, userName },
       option: { new: true }
     });
   } else {
     updateUser = await findByIdAndUpdate({
       model: userModel,
       condition: { _id: user._id },
-      data: { userName, gender },
+      data: { userName, gender, userLink, linkName },
       option: { new: true }
     });
   }
@@ -155,19 +168,15 @@ export const profile = asyncHandler(async (req, res, next) => {
   return res.status(200).json({ message: "Done", user });
 });
 export const user = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
+  const { userName } = req.params;
   const populate = [{
     path: "wishList"
   }]
-  const user = await findById({
+  const user = await findOne({
     model: userModel,
-    condition: id,
+    condition: { linkName: userName },
     populate
   });
+  console.log(user);
   return res.status(200).json({ message: "Done", user });
-});
-export const profileLink = asyncHandler(async (req, res, next) => {
-  const { user } = req;
-  const link = `${process.env.SENDMESSAGE}?userId=${user._id}`
-  return res.status(200).json({ message: "Done", link });
 });

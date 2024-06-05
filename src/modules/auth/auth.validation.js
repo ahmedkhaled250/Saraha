@@ -8,6 +8,12 @@ export const signup = joi
       "string.empty": "not allowed to be empty",
       "string.base": "only string is allowed",
     }),
+    linkName: joi.string().required().min(2).max(20).messages({
+      "any.required": "linkName is required",
+      "string.empty": "not allowed to be empty",
+      "string.base": "only string is allowed",
+    }),
+
     email: generalFields.email.messages({
       "any.required": "Email is required",
       "string.empty": "not allowed to be empty",

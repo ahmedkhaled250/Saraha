@@ -10,13 +10,18 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import sendEmail from "../../../utils/sendEmail.js";
 export const signup = asyncHandler(async (req, res, next) => {
-  const { email, password, userName, gender } = req.body;
+  const { email, password, userName, gender, linkName } = req.body;
   const checkEmail = await findOne({ model: userModel, condition: { email } });
   if (checkEmail) {
     return next(new Error("Email exist", { cause: 409 }));
   }
+  const checkLinkName = await findOne({ model: userModel, condition: { linkName } });
+  if (checkLinkName) {
+    return next(new Error("linkName exist", { cause: 409 }));
+  }
+  const userLink = `${process.env.SENDMESSAGE}?userName=${linkName}`
   const hash = bcrypt.hashSync(password, parseInt(process.env.SALTROUND));
-  const newUser = new userModel({ email, password: hash, userName, gender });
+  const newUser = new userModel({ email, password: hash, linkName, userName, gender, userLink });
   const token = jwt.sign({ id: newUser._id }, process.env.EMAILTOKEN, {
     expiresIn: 60 * 60,
   });
@@ -33,6 +38,7 @@ export const signup = asyncHandler(async (req, res, next) => {
     subject: "Confirm email",
     message,
   });
+  console.log(info);
   if (info.accepted.length) {
     await newUser.save();
     return res.status(201).json({ message: "Done", id: newUser._id });
@@ -94,7 +100,7 @@ export const signin = asyncHandler(async (req, res, next) => {
   const token = jwt.sign({ id: user._id }, process.env.TOKENSEGNITURE, {
     expiresIn: "1d",
   });
-  return res.status(200).json({ message: "Done", token, id:user._id });
+  return res.status(200).json({ message: "Done", token });
 });
 export const signout = asyncHandler(async (req, res, next) => {
   const { user } = req;

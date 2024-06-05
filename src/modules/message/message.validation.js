@@ -2,7 +2,7 @@ import joi from "joi";
 import { generalFields, validateQuery } from "../../middlewhere/validation.js";
 export const addMessage = joi
   .object({
-    text: joi.string().min(5).max(200).required().messages({
+    text: joi.string().min(5).max(500).required().messages({
       "any.required": "text is required",
       "string.empty": "not allowed to be empty",
       "string.base": "only string is allowed",
